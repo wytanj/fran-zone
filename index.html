@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>fran · Bugis+ store</title>
+    <link rel="icon" type="image/png" href="/logo-2c.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Caveat:wght@600;700&family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <div id="app">
+      <canvas id="store"></canvas>
+
+      <header class="hud-top">
+        <div class="brand-lockup">
+          <img class="wordmark" src="/logo-2c.png" alt="fran" />
+          <div class="brand-meta">
+            <p class="eyebrow">Bugis+ · #01-04</p>
+            <p class="place" id="place-label">Entrance aisle</p>
+            <p class="coords" id="coord-readout">17.35 m E  ·  3.35 m S</p>
+          </div>
+        </div>
+        <div class="hud-actions">
+          <button type="button" id="btn-follow" class="chip is-on">Follow Wisp</button>
+          <button type="button" id="btn-plan" class="chip">Plan</button>
+          <button type="button" id="btn-grid" class="chip is-on">Grid</button>
+          <button type="button" id="btn-reset" class="chip">Reset view</button>
+        </div>
+      </header>
+
+      <aside class="inspect" id="inspect" hidden>
+        <p class="eyebrow" id="inspect-kicker">Bay</p>
+        <h2 id="inspect-title">—</h2>
+        <p class="inspect-body" id="inspect-body"></p>
+        <ul class="inspect-list" id="inspect-list"></ul>
+      </aside>
+
+      <div class="minimap-wrap">
+        <canvas id="minimap" width="280" height="168"></canvas>
+        <p class="mini-caption">Furniture plan · drag to pan</p>
+      </div>
+
+      <div class="wisp-card" id="avatar-card">
+        <img id="avatar-thumb" src="/textures/wisp.jpg" alt="Wisp" />
+        <div class="avatar-copy">
+          <p class="eyebrow">Avatar</p>
+          <p class="wisp-name" id="avatar-name">Wisp</p>
+          <p class="wisp-hint" id="wisp-hint">Walk the aisles. Pan anytime.</p>
+          <div class="avatar-switch">
+            <button type="button" id="btn-avatar-wisp" class="chip is-on">Wisp</button>
+            <button type="button" id="btn-avatar-height" class="chip">Height</button>
+          </div>
+          <div class="height-panel" id="height-panel" hidden>
+            <label class="height-readout" for="height-range">
+              <span id="height-value">165</span><span class="height-unit">cm</span>
+            </label>
+            <input id="height-range" type="range" min="0" max="250" value="165" step="1" />
+            <div class="height-presets">
+              <button type="button" data-cm="0">0</button>
+              <button type="button" data-cm="90">90</button>
+              <button type="button" data-cm="120">120</button>
+              <button type="button" data-cm="150">150</button>
+              <button type="button" data-cm="165">165</button>
+              <button type="button" data-cm="180">180</button>
+              <button type="button" data-cm="200">200</button>
+              <button type="button" data-cm="250">250</button>
+            </div>
+            <p class="mini-caption">Rulers on gondolas and wallbays. Yellow mark is this height.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="help" id="help">
+        <p><kbd>WASD</kbd> move · <kbd>click</kbd> walk · <kbd>drag</kbd> orbit</p>
+        <p><kbd>MMB</kbd> / <kbd>Shift+drag</kbd> / arrows <strong>pan</strong> · scroll zoom</p>
+        <p>Tap a bay to read the VM card. Plan is an X-ray — pillars stay solid.</p>
+      </div>
+
+      <div class="joystick" id="joystick" aria-hidden="true">
+        <div class="joystick-base">
+          <div class="joystick-knob" id="joystick-knob"></div>
+        </div>
+      </div>
+    </div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
