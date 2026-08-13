@@ -18,60 +18,80 @@
       <canvas id="store"></canvas>
 
       <header class="hud-top">
-        <div class="brand-lockup">
-          <img class="wordmark" src="/logo-2c.png" alt="fran" />
-          <div class="brand-meta">
-            <p class="eyebrow">Bugis+ · #01-04</p>
-            <p class="place" id="place-label">Entrance aisle</p>
-            <p class="coords" id="coord-readout">17.35 m E  ·  3.35 m S</p>
+        <div class="brand-lockup hud-panel" data-hud="place">
+          <button type="button" class="hud-min" aria-label="Minimize place"></button>
+          <span class="hud-peek">fran</span>
+          <div class="hud-body brand-lockup-body">
+            <img class="wordmark" src="/logo-2c.png" alt="fran" />
+            <div class="brand-meta">
+              <p class="eyebrow">Bugis+ · #01-04</p>
+              <p class="place" id="place-label">Entrance aisle</p>
+              <p class="coords" id="coord-readout">17.35 m E  ·  3.35 m S</p>
+            </div>
           </div>
         </div>
-        <div class="hud-actions">
-          <button type="button" id="btn-follow" class="chip is-on">Follow Wisp</button>
-          <button type="button" id="btn-plan" class="chip">Plan</button>
-          <button type="button" id="btn-grid" class="chip is-on">Grid</button>
-          <button type="button" id="btn-reset" class="chip">Reset view</button>
+        <div class="hud-actions hud-panel" data-hud="view">
+          <button type="button" class="hud-min" aria-label="Minimize view"></button>
+          <span class="hud-peek">View</span>
+          <div class="hud-body hud-actions-body">
+            <button type="button" id="btn-follow" class="chip is-on">Follow Wisp</button>
+            <button type="button" id="btn-plan" class="chip">Plan</button>
+            <button type="button" id="btn-grid" class="chip is-on">Grid</button>
+            <button type="button" id="btn-reset" class="chip">Reset view</button>
+          </div>
         </div>
       </header>
 
-      <aside class="inspect" id="inspect" hidden>
-        <p class="eyebrow" id="inspect-kicker">Bay</p>
-        <h2 id="inspect-title">—</h2>
-        <p class="inspect-body" id="inspect-body"></p>
-        <ul class="inspect-list" id="inspect-list"></ul>
+      <aside class="inspect hud-panel" id="inspect" data-hud="inspect" hidden>
+        <button type="button" class="hud-min" aria-label="Minimize brands"></button>
+        <span class="hud-peek" id="inspect-peek">Bay</span>
+        <div class="hud-body">
+          <p class="eyebrow" id="inspect-kicker">Bay</p>
+          <h2 id="inspect-title">—</h2>
+          <p class="inspect-body" id="inspect-body"></p>
+          <ul class="inspect-list" id="inspect-list"></ul>
+        </div>
       </aside>
 
-      <div class="minimap-wrap">
-        <canvas id="minimap" width="280" height="168"></canvas>
-        <p class="mini-caption">Furniture plan · drag to pan</p>
+      <div class="minimap-wrap hud-panel" data-hud="map">
+        <button type="button" class="hud-min" aria-label="Minimize map"></button>
+        <span class="hud-peek">Map</span>
+        <div class="hud-body">
+          <canvas id="minimap" width="280" height="168"></canvas>
+          <p class="mini-caption">Furniture plan · drag to pan</p>
+        </div>
       </div>
 
-      <div class="wisp-card" id="avatar-card">
-        <img id="avatar-thumb" src="/textures/wisp.jpg" alt="Wisp" />
-        <div class="avatar-copy">
-          <p class="eyebrow">Avatar</p>
-          <p class="wisp-name" id="avatar-name">Wisp</p>
-          <p class="wisp-hint" id="wisp-hint">Walk the aisles. Pan anytime.</p>
-          <div class="avatar-switch">
-            <button type="button" id="btn-avatar-wisp" class="chip is-on">Wisp</button>
-            <button type="button" id="btn-avatar-height" class="chip">Height</button>
-          </div>
-          <div class="height-panel" id="height-panel" hidden>
-            <label class="height-readout" for="height-range">
-              <span id="height-value">165</span><span class="height-unit">cm</span>
-            </label>
-            <input id="height-range" type="range" min="0" max="250" value="165" step="1" />
-            <div class="height-presets">
-              <button type="button" data-cm="0">0</button>
-              <button type="button" data-cm="90">90</button>
-              <button type="button" data-cm="120">120</button>
-              <button type="button" data-cm="150">150</button>
-              <button type="button" data-cm="165">165</button>
-              <button type="button" data-cm="180">180</button>
-              <button type="button" data-cm="200">200</button>
-              <button type="button" data-cm="250">250</button>
+      <div class="wisp-card hud-panel" id="avatar-card" data-hud="avatar">
+        <button type="button" class="hud-min" aria-label="Minimize avatar"></button>
+        <span class="hud-peek" id="avatar-peek">Wisp</span>
+        <div class="hud-body avatar-body">
+          <img id="avatar-thumb" src="/textures/wisp.jpg" alt="Wisp" />
+          <div class="avatar-copy">
+            <p class="eyebrow">Avatar</p>
+            <p class="wisp-name" id="avatar-name">Wisp</p>
+            <p class="wisp-hint" id="wisp-hint">Walk the aisles. Pan anytime.</p>
+            <div class="avatar-switch">
+              <button type="button" id="btn-avatar-wisp" class="chip is-on">Wisp</button>
+              <button type="button" id="btn-avatar-height" class="chip">Height</button>
             </div>
-            <p class="mini-caption">Rulers on gondolas and wallbays. Yellow mark is this height.</p>
+            <div class="height-panel" id="height-panel" hidden>
+              <label class="height-readout" for="height-range">
+                <span id="height-value">165</span><span class="height-unit">cm</span>
+              </label>
+              <input id="height-range" type="range" min="0" max="250" value="165" step="1" />
+              <div class="height-presets">
+                <button type="button" data-cm="0">0</button>
+                <button type="button" data-cm="90">90</button>
+                <button type="button" data-cm="120">120</button>
+                <button type="button" data-cm="150">150</button>
+                <button type="button" data-cm="165">165</button>
+                <button type="button" data-cm="180">180</button>
+                <button type="button" data-cm="200">200</button>
+                <button type="button" data-cm="250">250</button>
+              </div>
+              <p class="mini-caption">Rulers on gondolas and wallbays. Yellow mark is this height.</p>
+            </div>
           </div>
         </div>
       </div>

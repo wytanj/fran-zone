@@ -50,6 +50,7 @@ export function createHud(wisp, controls, rulers, grid) {
   bindJoystick(controls);
   bindMinimapPan(mini, controls);
   bindAvatar(wisp, rulers);
+  bindHudPanels();
 
   let lastNear = null;
   let lastHeight = -1;
@@ -62,6 +63,8 @@ export function createHud(wisp, controls, rulers, grid) {
     inspect.hidden = false;
     kicker.textContent = data.concept ? 'VM bay' : 'Fixture';
     title.textContent = data.name ?? (data.category || 'Bay');
+    const peek = document.getElementById('inspect-peek');
+    if (peek) peek.textContent = data.name ?? data.category ?? 'Bay';
     body.textContent = data.concept ?? '';
     list.innerHTML = '';
     const rows = [
@@ -174,6 +177,8 @@ export function createHud(wisp, controls, rulers, grid) {
     const x = wisp.position.x;
     const z = wisp.position.z;
     placeEl.textContent = placeName(x, z);
+    const placePeek = document.querySelector('[data-hud="place"] .hud-peek');
+    if (placePeek) placePeek.textContent = placeName(x, z);
     if (coordEl) {
       coordEl.textContent = `${x.toFixed(2)} m E  ·  ${z.toFixed(2)} m S`;
     }
@@ -233,6 +238,8 @@ function bindAvatar(wisp, rulers) {
     panel.hidden = !heightOn;
     rulers?.setVisible(heightOn);
     name.textContent = heightOn ? `${wisp.heightCm} cm shopper` : 'Wisp';
+    const peek = document.getElementById('avatar-peek');
+    if (peek) peek.textContent = name.textContent;
     hint.textContent = heightOn
       ? 'Rulers on each gondola and wallbay.'
       : 'Walk the aisles. Pan anytime.';
@@ -247,11 +254,61 @@ function bindAvatar(wisp, rulers) {
   range.addEventListener('input', () => {
     applyHeight(range.value);
     name.textContent = `${wisp.heightCm} cm shopper`;
+    const peek = document.getElementById('avatar-peek');
+    if (peek) peek.textContent = name.textContent;
   });
   document.querySelectorAll('.height-presets button').forEach((btn) => {
     btn.addEventListener('click', () => {
       applyHeight(btn.dataset.cm);
       name.textContent = `${wisp.heightCm} cm shopper`;
+      const peek = document.getElementById('avatar-peek');
+      if (peek) peek.textContent = name.textContent;
+    });
+  });
+}
+
+function isCompactHud() {
+  return window.matchMedia('(max-width: 720px), (pointer: coarse)').matches;
+}
+
+function bindHudPanels() {
+  const key = 'fran-hud';
+  let saved = {};
+  try {
+    saved = JSON.parse(localStorage.getItem(key) || '{}') || {};
+  } catch {
+    saved = {};
+  }
+  const compact = isCompactHud();
+
+  function persist() {
+    const next = {};
+    document.querySelectorAll('[data-hud]').forEach((el) => {
+      next[el.dataset.hud] = el.classList.contains('is-min');
+    });
+    localStorage.setItem(key, JSON.stringify(next));
+  }
+
+  function setMin(el, on) {
+    el.classList.toggle('is-min', on);
+    const btn = el.querySelector('.hud-min');
+    if (btn) btn.setAttribute('aria-label', on ? 'Expand' : 'Minimize');
+  }
+
+  document.querySelectorAll('[data-hud]').forEach((el) => {
+    const id = el.dataset.hud;
+    const startMin = typeof saved[id] === 'boolean' ? saved[id] : compact;
+    setMin(el, startMin);
+    el.querySelector('.hud-min')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      setMin(el, !el.classList.contains('is-min'));
+      persist();
+    });
+    el.addEventListener('click', () => {
+      if (el.classList.contains('is-min')) {
+        setMin(el, false);
+        persist();
+      }
     });
   });
 }
