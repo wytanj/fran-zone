@@ -28,8 +28,9 @@ export function makeWallBay(mats, spec, stocker) {
   const headH = BAY.headerH;
   const total = BAY.wallH;
   const cat = categories[spec.category] ?? categories.skincare;
+  const isWBM = spec.variant === 'WB-M';
 
-  box(mats.drawer, w, drawerH, d, 0, drawerH / 2, 0, group, false);
+  box(isWBM ? mats.blush : mats.drawer, w, drawerH, d, 0, drawerH / 2, 0, group, false);
   box(mats.wallBay, w, total - drawerH, 0.03, 0, drawerH + (total - drawerH) / 2, -d / 2 + 0.02, group);
   box(mats.wallBay, 0.03, total - drawerH, d, -w / 2 + 0.015, drawerH + (total - drawerH) / 2, 0, group);
   box(mats.wallBay, 0.03, total - drawerH, d, w / 2 - 0.015, drawerH + (total - drawerH) / 2, 0, group);
@@ -54,7 +55,7 @@ export function makeWallBay(mats, spec, stocker) {
   box(mats.canopy, w - 0.04, headH, 0.04, 0, lightY, d / 2 - 0.02, group, false);
   const lightFace = new THREE.Mesh(
     new THREE.PlaneGeometry(w - 0.08, headH - 0.06),
-    new THREE.MeshBasicMaterial({ map: headerTexture(cat.label, { bg: '#fff4a8', fg: '#3a2415' }), toneMapped: false }),
+    new THREE.MeshBasicMaterial({ map: headerTexture(cat.label, { bg: isWBM ? '#f6cdd6' : '#fff4a8', fg: '#3a2415' }), toneMapped: false }),
   );
   lightFace.position.set(0, lightY, d / 2 + 0.005);
   group.add(lightFace);
@@ -80,25 +81,31 @@ export function makeGondola(mats, spec, stocker) {
   const d = BAY.gondolaD;
   const h = BAY.gondolaH;
   const end = BAY.endcap;
-  const hygiene = spec.hygiene;
+  const ends = spec.ends ?? { w: 'EC-S3', e: 'EC-S3' };
+  const endW = (type) => (type === 'lightbox' ? BAY.lightboxW : end);
+  const spineMat = spec.makeup ? mats.blush : mats.gondola;
 
   box(mats.gondolaDark, w, 0.1, d, 0, 0.05, 0, group);
-  box(mats.gondola, 0.04, h - 0.1, d - 0.08, 0, h / 2 + 0.05, 0, group);
 
-  const inner = w - end * 2;
+  // Runs between the two end modules; the pair can be asymmetric.
+  const wWest = endW(ends.w);
+  const wEast = endW(ends.e);
+  const inner = w - wWest - wEast;
+  const innerCx = (wWest - wEast) / 2;
+  box(spineMat, 0.04, h - 0.1, d - 0.08, innerCx, h / 2 + 0.05, 0, group);
   const bayCount = spec.bays;
   for (let b = 1; b < bayCount; b += 1) {
-    const x = -inner / 2 + (inner / bayCount) * b;
+    const x = innerCx - inner / 2 + (inner / bayCount) * b;
     box(mats.gondolaDark, 0.02, h - 0.12, d - 0.1, x, h / 2 + 0.04, 0, group, false);
   }
 
-  const shelfYs = [0.36, 0.64, 0.92, 1.2];
+  const shelfYs = spec.shelves === 5 ? [0.32, 0.58, 0.84, 1.1, 1.36] : [0.36, 0.64, 0.92, 1.2];
   for (const y of shelfYs) {
-    box(mats.shelf, inner - 0.04, 0.02, d - 0.06, 0, y, 0, group, false);
+    box(mats.shelf, inner - 0.04, 0.02, d - 0.06, innerCx, y, 0, group, false);
     for (const side of [-1, 1]) {
       const face = side === 1 ? 0 : Math.PI;
       stocker.fillShelf({
-        origin: { x: spec.x, z: spec.z + side * (d / 2 - 0.14) },
+        origin: { x: spec.x + innerCx, z: spec.z + side * (d / 2 - 0.14) },
         width: inner - 0.1,
         y,
         category: spec.category,
@@ -108,42 +115,72 @@ export function makeGondola(mats, spec, stocker) {
     }
   }
 
-  // Endcaps face the east–west aisle. Open shelves (plus a glass door on 3-bay).
+  // End modules face the east–west aisle. Rev 18/08 types:
+  // EC-S3 (3 shelves + L-panel + hygiene) · EC-S5 (5 shelves + frost panel)
+  // EC-M (makeup, 4 shelves) · lightbox (illuminated tower).
   for (const dir of [-1, 1]) {
+    const type = dir < 0 ? ends.w : ends.e;
+
+    if (type === 'lightbox') {
+      const lw = BAY.lightboxW;
+      const x = dir * (w / 2 - lw / 2);
+      box(mats.gondolaDark, lw, 0.12, d, x, 0.06, 0, group);
+      box(mats.lightbox, lw - 0.02, 1.78, d - 0.04, x, 0.12 + 0.89, 0, group, false);
+      box(mats.gondolaDark, lw, 0.06, d, x, 2.03, 0, group, false);
+      const glow = new THREE.PointLight(0xfff0b8, 1.4, 3.5, 1.8);
+      glow.position.set(x, 1.4, 0);
+      group.add(glow);
+      continue;
+    }
+
     const x = dir * (w / 2 - end / 2);
     box(mats.gondolaDark, end, 0.1, d, x, 0.05, 0, group);
     box(mats.gondola, 0.03, h - 0.1, d - 0.04, x - dir * (end / 2 - 0.02), h / 2 + 0.05, 0, group);
     box(mats.gondola, end, h - 0.1, 0.03, x, h / 2 + 0.05, d / 2 - 0.015, group);
     box(mats.gondola, end, h - 0.1, 0.03, x, h / 2 + 0.05, -d / 2 + 0.015, group);
-    box(mats.gondola, end, 0.03, d, x, h - 0.02, 0, group, false);
+    box(type === 'EC-M' ? mats.blush : mats.gondola, end, 0.03, d, x, h - 0.02, 0, group, false);
 
+    const levels =
+      type === 'EC-S5' ? [0.3, 0.56, 0.82, 1.08, 1.34]
+      : type === 'EC-S3' ? [0.45, 0.85, 1.25]
+      : [0.36, 0.64, 0.92, 1.2];
     const face = dir > 0 ? Math.PI / 2 : -Math.PI / 2;
     const outward = spec.x + dir * (w / 2 - 0.05);
-    for (const y of [0.36, 0.64, 0.92, 1.2]) {
+    for (const y of levels) {
       box(mats.shelf, end - 0.05, 0.018, d - 0.08, x, y, 0, group, false);
       stocker.fillShelf({
         origin: { x: outward, z: spec.z },
         width: d - 0.14,
         depth: 0.16,
         y,
-        category: hygiene ? 'cleanser' : spec.category,
+        category: spec.category,
         facing: face,
         density: 1.15,
       });
     }
 
-    if (hygiene) {
+    if (type === 'EC-S3') {
+      // L-shape side panel wrapping the outer corner, hygiene unit mounted on it.
+      const px = x + dir * (end / 2 - 0.015);
+      box(mats.gondola, 0.03, h + 0.15, d, px, (h + 0.15) / 2, 0, group);
+      box(mats.gondola, 0.45, h + 0.15, 0.03, x + dir * (end / 2 - 0.225), (h + 0.15) / 2, -d / 2 + 0.015, group);
+      box(mats.hygiene, 0.06, 0.34, 0.22, px + dir * 0.045, 1.12, 0, group, false);
+      box(mats.shelf, 0.12, 0.018, 0.26, px + dir * 0.07, 0.92, 0, group, false);
+    } else if (type === 'EC-S5') {
+      // White transparent side panel.
       const glass = new THREE.Mesh(
-        new THREE.BoxGeometry(0.02, h - 0.2, d - 0.08),
-        mats.fridgeGlass,
+        new THREE.BoxGeometry(0.02, h - 0.08, d - 0.04),
+        mats.panelFrost,
       );
-      glass.position.set(x + dir * (end / 2 - 0.015), h / 2 + 0.02, 0);
+      glass.position.set(x + dir * (end / 2 - 0.01), h / 2 + 0.03, 0);
       group.add(glass);
+    } else if (type === 'EC-M') {
+      box(mats.blush, 0.03, h - 0.08, d - 0.04, x + dir * (end / 2 - 0.015), h / 2 + 0.03, 0, group);
     }
   }
 
   const logoY = h - BAY.gondolaLogo / 2;
-  box(mats.header, w, BAY.gondolaLogo, 0.04, 0, logoY, d / 2 + 0.01, group, false);
+  box(spec.makeup ? mats.blush : mats.header, w, BAY.gondolaLogo, 0.04, 0, logoY, d / 2 + 0.01, group, false);
   const logoFace = new THREE.Mesh(
     new THREE.PlaneGeometry(w - 0.08, BAY.gondolaLogo - 0.04),
     new THREE.MeshBasicMaterial({ map: logoStripTexture(spec.brands ?? ['fran']), toneMapped: false }),
@@ -154,6 +191,32 @@ export function makeGondola(mats, spec, stocker) {
   logoBack.position.z = -d / 2 - 0.032;
   logoBack.rotation.y = Math.PI;
   group.add(logoBack);
+
+  group.userData.fixture = spec;
+  return group;
+}
+
+/** Wallbay hygiene station (rev 18/08) — slim sanitiser / tester point. */
+export function makeHygieneStation(mats, spec) {
+  const group = new THREE.Group();
+  group.userData.xray = 'ghost';
+  const facing = spec.facing === 's' ? 0 : Math.PI;
+  group.position.set(spec.x, 0, spec.z);
+  group.rotation.y = facing;
+  const w = spec.w;
+  const d = 0.38;
+
+  box(mats.gondola, w, 0.9, d, 0, 0.45, 0, group);
+  box(mats.hygiene, w, 0.05, d + 0.02, 0, 0.925, 0, group, false);
+  box(mats.gondola, w, 1.5, 0.05, 0, 0.75 + 0.9, -d / 2 + 0.025, group);
+  const mirror = new THREE.Mesh(
+    new THREE.PlaneGeometry(w - 0.05, 0.62),
+    mats.steel,
+  );
+  mirror.position.set(0, 1.45, -d / 2 + 0.055);
+  group.add(mirror);
+  box(mats.hygiene, 0.07, 0.16, 0.07, 0.03, 1.03, 0.02, group, false);
+  box(mats.black, 0.09, 0.05, 0.09, -0.05, 0.975, 0.05, group, false);
 
   group.userData.fixture = spec;
   return group;

@@ -1,12 +1,17 @@
 import { catalog, productsForBrand } from './catalog.js';
 
 /**
- * FRAN @ Bugis+ #01-04 furniture plan (PL-01).
+ * FRAN @ Bugis+ #01-04 furniture plan (PL-01, rev 18/08/26).
  * Units: metres. Origin = outer NW corner of the main sales rectangle.
  * +X east, +Z south, +Y up.
  *
  * Sales 178 m² · stock 34 m² · locker 4 m² · total 230 m².
  * Brand / product names come from fran-skums (sample-brands + product-list).
+ *
+ * Rev 18/08 fixture legend: 19× WB-S5 + 7× WB-M wallbays, 12× makeup +
+ * 12× standard-4 + 8× standard-5 gondolas, endcaps EC-S3 ×6 / EC-S5 ×3 /
+ * EC-M ×1, lightbox towers ×2, hygiene stations ×19 (8 on L-panels,
+ * 8 standalone, 3 on the WB-M run).
  */
 
 function merch(brandNames) {
@@ -43,9 +48,11 @@ export const BAY = {
   gondolaLogo: 0.175,
   endcap: 0.431,
   bayW: 0.9,
+  lightboxW: 0.25,
+  hygieneW: 0.213,
   twoBay: 2.662,
-  threeBay: 3.962,
-  threeBayShort: 3.56,
+  threeBay: 3.762,
+  threeBayShort: 3.381,
 };
 
 /** Shop-drawing component stacks (Rev 9) — metres from finished floor. */
@@ -77,91 +84,111 @@ export const STACKS = {
 
 const WB = BAY.wallD;
 
-/** Gondolas — 2× 2-bay + 4× 3-bay + endcap (+ hygiene glass on 3-bay). */
+/** WB-M bay centres — run starts at x 9.55; stations sit after bays 2, 4, 7. */
+const WBM_XS = [10.0, 10.9, 12.013, 12.913, 14.026, 14.926, 15.826];
+const HS_XS = [11.4565, 13.4695, 16.3825];
+
+/**
+ * Gondola islands — rev 18/08. Per-end fittings via `ends` (w = west, e = east):
+ * EC-S3 · 3-shelf endcap, L-shape side panel + mounted hygiene station.
+ * EC-S5 · 5-shelf endcap, white transparent side panel.
+ * EC-M  · makeup endcap, 4 shelves.
+ * lightbox · illuminated tower (250 wide) replacing the endcap.
+ * 3-bay islands are 200 shorter than rev 13/08 (3581→3381, 3962→3762);
+ * east edges hold, the trim comes off the west end.
+ */
 export const gondolas = [
   {
     id: 'NL',
     name: 'North 2-bay',
     bays: 2,
+    shelves: 5,
     w: BAY.twoBay,
     x: 6.531,
     z: WB + 1.7 + BAY.gondolaD / 2,
     rot: 0,
-    hygiene: false,
+    ends: { w: 'EC-S3', e: 'EC-S3' },
     category: 'skincare',
-    concept: 'Brand wall / gondola · functions',
+    concept: 'Standard gondola (5 shelves) · functions',
     ...merch(catalog.plan.gondolas.NL.brands),
-    vm: ['Lightbox', 'POP box', 'Risers / testers', 'Glorifier'],
+    vm: ['POP box', 'Risers / testers', 'Glorifier', 'Hygiene on L-panels'],
   },
   {
     id: 'NM',
     name: 'North 3-bay',
     bays: 3,
+    shelves: 4,
+    makeup: true,
     w: BAY.threeBayShort,
-    x: 10.85,
+    x: 10.94,
     z: WB + 1.7 + BAY.gondolaD / 2,
     rot: 0,
-    hygiene: true,
-    category: 'serum',
-    concept: 'Category gondola · serum / routine',
-    ...merch(catalog.plan.gondolas.NM.brands),
-    vm: ['Lightbox', 'POP box', 'Risers / testers', 'Callout'],
+    ends: { w: 'lightbox', e: 'EC-S3' },
+    category: 'makeup',
+    concept: 'Makeup gondola · colour cosmetics',
+    ...merch(['Dear Dahlia', 'espoir', 'ETUDE']),
+    vm: ['Lightbox tower', 'Product grid', 'Hygiene on L-panel'],
   },
   {
     id: 'NR',
     name: 'North 3-bay',
     bays: 3,
+    shelves: 4,
+    makeup: true,
     w: BAY.threeBay,
-    x: 15.62,
+    x: 15.72,
     z: WB + 1.7 + BAY.gondolaD / 2,
     rot: 0,
-    hygiene: true,
+    ends: { w: 'EC-M', e: 'EC-S3' },
     category: 'makeup',
-    concept: 'Brand gondola · makeup',
+    concept: 'Makeup gondola · brands + EC-M endcap',
     ...merch(catalog.plan.gondolas.NR.brands),
-    vm: ['Lightbox', 'Product grid'],
+    vm: ['EC-M endcap', 'Product grid', 'Hygiene on L-panel'],
   },
   {
     id: 'SL',
     name: 'South 2-bay',
     bays: 2,
+    shelves: 5,
     w: BAY.twoBay,
     x: 5.8,
     z: PLAN.depthWest - WB - 1.7 - BAY.gondolaD / 2,
     rot: 0,
-    hygiene: false,
+    ends: { w: 'EC-S5', e: 'EC-S3' },
     category: 'hair',
-    concept: 'Brand gondola · hair / body',
+    concept: 'Standard gondola (5 shelves) · hair / body',
     ...merch(catalog.plan.gondolas.SL.brands),
-    vm: ['Lightbox', 'POP box', 'Risers / testers'],
+    vm: ['POP box', 'Risers / testers', 'EC-S5 transparent panel'],
   },
   {
     id: 'SM',
     name: 'South 3-bay',
     bays: 3,
-    w: BAY.threeBay,
-    x: 10.05,
+    shelves: 4,
+    w: BAY.threeBayShort,
+    x: 10.32,
     z: PLAN.depthWest - WB - 1.7 - BAY.gondolaD / 2,
     rot: 0,
-    hygiene: true,
+    ends: { w: 'lightbox', e: 'EC-S3' },
     category: 'cleanser',
     concept: 'Category gondola · cleanser / moisturiser',
     ...merch(catalog.plan.gondolas.SM.brands),
-    vm: ['Lightbox', 'POP box', 'Callout'],
+    vm: ['Lightbox tower', 'POP box', 'Callout'],
   },
   {
     id: 'SR',
     name: 'South 3-bay',
     bays: 3,
+    shelves: 4,
     w: BAY.threeBay,
-    x: 15.08,
+    x: 15.39,
     z: PLAN.depthWest - WB - 1.7 - BAY.gondolaD / 2,
     rot: 0,
-    hygiene: true,
+    ends: { w: 'EC-S5', e: 'EC-S5' },
     category: 'suncare',
     concept: 'Category gondola · sun',
     ...merch(catalog.plan.gondolas.SR.brands),
-    vm: ['Lightbox', 'Risers / testers', 'Callout'],
+    vm: ['EC-S5 transparent panels', 'Risers / testers', 'Callout'],
   },
 ];
 
@@ -178,14 +205,9 @@ export const wallBays = [
     category: 'hair',
     brandList: catalog.plan.wallBays.hair,
   }),
-  ...run({
-    count: 8,
-    startX: 10.0,
-    z: WB / 2,
-    facing: 's',
-    category: 'makeup',
-    brandList: catalog.plan.wallBays.makeup,
-  }),
+  // Rev 18/08: north-east run is 7 makeup wallbays (WB-M) with 3 wallbay
+  // hygiene stations interleaved (2+2+3 pattern, 6939 total).
+  ...makeupRun(),
   ...run({
     count: 5,
     startX: 5.78,
@@ -220,6 +242,39 @@ export const wallBays = [
     brandList: catalog.plan.wallBays.skincareEast,
   }),
 ];
+
+function makeupRun() {
+  const brandList = catalog.plan.wallBays.makeup;
+  return WBM_XS.map((x, i) => {
+    const brand = brandList[i % brandList.length];
+    return {
+      id: `WB-M-${i}`,
+      name: brand,
+      x,
+      z: WB / 2,
+      facing: 's',
+      category: 'makeup',
+      variant: 'WB-M',
+      ...merch([brand]),
+      concept: `Makeup wallbay (WB-M) · ${brand}`,
+      vm: ['P4 LED category', 'Brand logo strip', 'Storage drawer'],
+    };
+  });
+}
+
+/** Wallbay hygiene stations (rev 18/08 · 3 nos on the WB-M run). */
+export const hygieneStations = HS_XS.map((x, i) => ({
+  id: `HS-W${i + 1}`,
+  name: 'Hygiene station',
+  x,
+  z: 0.19,
+  w: BAY.hygieneW,
+  facing: 's',
+  category: 'service',
+  concept: 'Wallbay hygiene station · sanitiser + testers (WB-M run)',
+  brands: [],
+  vm: ['Sanitiser', 'Tissue / bin', 'Mirror'],
+}));
 
 function run({ count, startX, z, facing, category, brandList }) {
   return runAlong({
@@ -277,18 +332,20 @@ export const doors = {
 };
 
 export const cashier = {
+  // Rev 18/08: counter depth 500 → 600.
   x: 1.55,
   z: 2.85,
   w: 1.8,
-  d: 0.55,
+  d: 0.6,
   h: 0.95,
   graffiti: { x: 0.08, z: 2.7, w: 0.04, d: 3.4, h: 2.6 },
   canopy: { x: 1.7, z: 2.7, w: 2.4, d: 1.6, y: 2.55 },
 };
 
+// Rev 18/08: queue line offset from the cashier 1000 → 1165.
 export const queueFixtures = [
-  { x: 3.35, z: 2.35, w: 1.0, d: 0.45, h: 0.9 },
-  { x: 3.35, z: 3.55, w: 1.0, d: 0.45, h: 0.9 },
+  { x: 3.52, z: 2.35, w: 1.0, d: 0.45, h: 0.9 },
+  { x: 3.52, z: 3.55, w: 1.0, d: 0.45, h: 0.9 },
 ];
 
 export const experience = {
@@ -531,6 +588,17 @@ export function fixtureAabbs() {
       id: 'queue',
       kind: 'queue',
       data: { name: 'Queue fixture', category: 'service', concept: 'Queue line', brands: [], vm: [] },
+    });
+  }
+  for (const h of hygieneStations) {
+    boxes.push({
+      x0: h.x - h.w / 2,
+      x1: h.x + h.w / 2,
+      z0: h.z - 0.19,
+      z1: h.z + 0.19,
+      id: h.id,
+      kind: 'hygiene',
+      data: h,
     });
   }
   for (const c of columns) {

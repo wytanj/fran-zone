@@ -11,6 +11,7 @@ import {
   stockRoom,
   locker,
   stockRacks,
+  hygieneStations,
   entrance,
   BOH,
   bohWalls,
@@ -28,6 +29,7 @@ import {
   makeEntrance,
   makeColumn,
   makeQueue,
+  makeHygieneStation,
   makeRoom,
   makeRack,
   makeDesk,
@@ -57,6 +59,7 @@ export function buildStore(scene) {
   for (const q of queueFixtures) root.add(makeQueue(mats, q));
   for (const g of gondolas) root.add(makeGondola(mats, g, stocker));
   for (const b of wallBays) root.add(makeWallBay(mats, b, stocker));
+  for (const h of hygieneStations) root.add(makeHygieneStation(mats, h));
   for (const c of columns) root.add(makeColumn(mats, c));
   root.add(makeExperience(mats, experience, stocker));
   root.add(makeEntrance(mats, entrance));
