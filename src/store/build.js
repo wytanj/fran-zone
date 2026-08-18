@@ -30,7 +30,7 @@ import {
   makeColumn,
   makeQueue,
   makeHygieneStation,
-  makeRoom,
+  makeLockerRoom,
   makeRack,
   makeDesk,
   makeReceiving,
@@ -65,13 +65,7 @@ export function buildStore(scene) {
   root.add(makeEntrance(mats, entrance));
   root.add(makeBohWalls(mats, bohWalls.filter((w) => !w.id.startsWith('stock-n')), BOH.ceiling));
   root.add(makeStockDoor(mats, BOH.stock.door, BOH.ceiling));
-  root.add(
-    makeRoom(mats, locker, 'locker', {
-      wall: 'e',
-      from: locker.door.z0,
-      to: locker.door.z1,
-    }),
-  );
+  root.add(makeLockerRoom(mats, locker, BOH.ceiling));
   root.add(makeDesk(mats, staffDesk));
   root.add(makeDesk(mats, managerDesk));
   root.add(makeReceiving(mats, receiving));

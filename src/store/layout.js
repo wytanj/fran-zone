@@ -683,6 +683,18 @@ export function fixtureAabbs() {
   for (const wall of bohWalls) {
     boxes.push({ ...wall, kind: 'wall', data: null });
   }
+  // Locker room fit-out (mirrors makeLockerRoom geometry): 2 lockers on the
+  // west wall, water dispenser by the north wall.
+  const lockerData = (name) => ({
+    name,
+    category: 'back of house',
+    concept: 'Locker room fit-out (PL-01)',
+    brands: [],
+    vm: [],
+  });
+  boxes.push({ x0: -1.83, x1: -1.33, z0: 6.07, z1: 6.63, id: 'locker-1', kind: 'locker', data: lockerData('Locker') });
+  boxes.push({ x0: -1.83, x1: -1.33, z0: 6.65, z1: 7.21, id: 'locker-2', kind: 'locker', data: lockerData('Locker') });
+  boxes.push({ x0: -1.57, x1: -1.23, z0: 5.45, z1: 5.79, id: 'water-disp', kind: 'locker', data: lockerData('Water dispenser') });
   // Locker walls (east wall is the west sales wall, with a door).
   boxes.push({ x0: BOH.locker.x0 - 0.08, x1: BOH.locker.x0 + 0.08, z0: BOH.locker.z0, z1: BOH.locker.z1, id: 'lock-w', kind: 'wall', data: null });
   boxes.push({ x0: BOH.locker.x0, x1: BOH.locker.x1, z0: BOH.locker.z0 - 0.08, z1: BOH.locker.z0 + 0.08, id: 'lock-n', kind: 'wall', data: null });

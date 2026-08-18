@@ -594,55 +594,81 @@ export function makeStockDoor(mats, door, height) {
   return group;
 }
 
-export function makeRoom(mats, spec, label, door) {
+/**
+ * Locker room (PL-01, 4 m²) — fully enclosed SW bulge: walls + roof cap,
+ * framed swing door with signage, and the plan's fit-out (2 lockers,
+ * water dispenser, DB panel).
+ */
+export function makeLockerRoom(mats, spec, height) {
   const group = new THREE.Group();
   group.userData.xray = 'wall';
   const t = 0.12;
-  const H = PLAN.ceiling - 0.08;
+  const H = height;
   const x0 = spec.x - spec.w / 2;
   const x1 = spec.x + spec.w / 2;
   const z0 = spec.z - spec.d / 2;
   const z1 = spec.z + spec.d / 2;
+  const door = spec.door;
 
-  function wall(x, z, w, d) {
-    box(mats.wallInner, w, H, d, x, H / 2, z, group, false);
-  }
-
-  // North
-  if (door?.wall === 'n') {
-    const mid = (door.from + door.to) / 2;
-    const gap = door.to - door.from;
-    const leftW = mid - gap / 2 - x0;
-    const rightW = x1 - (mid + gap / 2);
-    if (leftW > 0.08) wall(x0 + leftW / 2, z0, leftW, t);
-    if (rightW > 0.08) wall(x1 - rightW / 2, z0, rightW, t);
-  } else {
-    wall(spec.x, z0, spec.w, t);
-  }
-  // South
-  wall(spec.x, z1, spec.w, t);
-  // West
-  wall(x0, spec.z, t, spec.d);
-  // East
-  if (door?.wall === 'e') {
-    const mid = (door.from + door.to) / 2;
-    const gap = door.to - door.from;
-    const topD = mid - gap / 2 - z0;
-    const botD = z1 - (mid + gap / 2);
-    if (topD > 0.08) wall(x1, z0 + topD / 2, t, topD);
-    if (botD > 0.08) wall(x1, z1 - botD / 2, t, botD);
-  } else {
-    wall(x1, spec.z, t, spec.d);
+  function wall(x, z, w, d, h = H, y = h / 2) {
+    box(mats.wallInner, w, h, d, x, y, z, group, false);
   }
 
-  if (label) {
-    const tmesh = new THREE.Mesh(
-      new THREE.PlaneGeometry(1.4, 0.28),
-      new THREE.MeshBasicMaterial({ map: headerTexture(label, { bg: '#8d8d8d', fg: '#fffef5', w: 700, size: 72 }), toneMapped: false }),
-    );
-    tmesh.position.set(spec.x, 2.1, z0 - 0.08);
-    group.add(tmesh);
+  // Shell: west, north, south, roof cap.
+  wall(x0, spec.z, t, spec.d + t * 2);
+  wall(spec.x, z0, spec.w + t * 2, t);
+  wall(spec.x, z1, spec.w + t * 2, t);
+  box(mats.wallInner, spec.w + t * 2.5, 0.1, spec.d + t * 2.5, spec.x, H + 0.05, spec.z, group, false);
+
+  // East wall split around the door, header above the leaf, and infill up
+  // to the sales ceiling so the envelope gap over the doorway is closed.
+  const topD = door.z0 - z0;
+  const botD = z1 - door.z1;
+  if (topD > 0.08) wall(x1, z0 + topD / 2, t, topD);
+  if (botD > 0.08) wall(x1, z1 - botD / 2, t, botD);
+  const doorMid = (door.z0 + door.z1) / 2;
+  const gap = door.z1 - door.z0;
+  wall(x1, doorMid, t, gap, H - 2.05, 2.05 + (H - 2.05) / 2);
+  const infillH = PLAN.ceiling - H;
+  box(mats.wall, 0.14, infillH, gap + 0.3, x1, H + infillH / 2, doorMid, group, false);
+
+  // Door frame + swing leaf, ajar into the room.
+  box(mats.steel, 0.08, 2.05, 0.08, x1, 1.025, door.z0, group, false);
+  box(mats.steel, 0.08, 2.05, 0.08, x1, 1.025, door.z1, group, false);
+  box(mats.steel, 0.08, 0.08, gap + 0.12, x1, 2.07, doorMid, group, false);
+  // Leaf hinged on the south jamb, ajar into the room.
+  const leaf = box(mats.wallInner, 0.04, 1.95, gap - 0.1, x1 - 0.375, 0.975, door.z1 - 0.33, group, false);
+  leaf.rotation.y = 0.85;
+  box(mats.steel, 0.03, 0.12, 0.03, x1 - 0.62, 1.0, door.z1 - 0.58, group, false);
+
+  const sign = new THREE.Mesh(
+    new THREE.PlaneGeometry(1.15, 0.22),
+    new THREE.MeshBasicMaterial({
+      map: headerTexture('LOCKER ROOM', { bg: '#8d8d8d', fg: '#fffef5', w: 800, size: 70 }),
+      toneMapped: false,
+    }),
+  );
+  sign.position.set(x1 + t / 2 + 0.01, 2.28, doorMid);
+  sign.rotation.y = Math.PI / 2;
+  group.add(sign);
+
+  // Fit-out per PL-01: two lockers on the west wall, water dispenser and
+  // DB panel on the north wall.
+  for (const lz of [spec.z + 0.07, spec.z + 0.65]) {
+    box(mats.steel, 0.5, 1.8, 0.55, x0 + t / 2 + 0.31, 0.9, lz, group);
+    box(mats.gondolaDark, 0.02, 1.7, 0.49, x0 + t / 2 + 0.57, 0.9, lz, group, false);
   }
+  box(mats.cream, 0.34, 1.0, 0.34, x0 + 0.55, 0.5, z0 + t / 2 + 0.28, group);
+  box(mats.fridgeGlass, 0.24, 0.3, 0.24, x0 + 0.55, 1.16, z0 + t / 2 + 0.28, group, false);
+  box(mats.black, 0.5, 0.7, 0.08, spec.x + 0.35, 1.5, z0 + t / 2 + 0.05, group, false);
+
+  group.userData.fixture = {
+    name: 'Locker room',
+    category: 'back of house',
+    concept: 'Locker room 4 m² · 2 lockers, water dispenser, DB',
+    brands: [],
+    vm: ['PL-01 locker room'],
+  };
   return group;
 }
 
