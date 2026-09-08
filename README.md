@@ -41,3 +41,7 @@ Panning is first-class, not an afterthought:
 - **Plan** flips to a top-down view you can pan across the unit
 
 `F` re-attaches the camera to Wisp. `P` toggles plan view.
+
+## Ideas
+
+- Heist mode (Pizza Possum energy): [docs/FRAN_ZONE_HEIST.md](docs/FRAN_ZONE_HEIST.md)
