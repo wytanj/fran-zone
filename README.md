@@ -19,9 +19,10 @@ Brand and product names on bays come from fran-skums (`sample-brands.csv` + `pro
 
 ## What’s in the scene
 
-- Sales floor from the PL-01 plan (178 m²), including the east mall opening
-- 26 wallbays with category LED headers and brand logo strips
-- 2× 2-bay gondolas and 4× 3-bay gondolas + endcaps (glass hygiene on the 3-bays)
+- Sales floor from the PL-01 plan rev 18/08/26 (178 m²), including the east mall opening
+- 26 wallbays (19× WB-S5 standard + 7× WB-M makeup) with category LED headers and brand logo strips
+- 2× 2-bay and 4× 3-bay gondola islands — makeup islands in blush, per-end EC-S3 / EC-S5 / EC-M endcaps and lightbox towers
+- Hygiene stations: mounted on EC-S3 L-panels + 3 on the WB-M wall run
 - Cash wrap, yellow canopy, graffiti brand wall
 - Experience zone: terrazzo, disc Barrisol, round tester table, angled mask wall
 - Stock room and locker as back-of-house volumes
@@ -41,3 +42,7 @@ Panning is first-class, not an afterthought:
 - **Plan** flips to a top-down view you can pan across the unit
 
 `F` re-attaches the camera to Wisp. `P` toggles plan view.
+
+## Ideas
+
+- Heist mode (Pizza Possum energy): build plan in [docs/FRAN_GAME.md](docs/FRAN_GAME.md); short idea note in [docs/FRAN_ZONE_HEIST.md](docs/FRAN_ZONE_HEIST.md)
