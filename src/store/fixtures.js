@@ -51,7 +51,7 @@ export function makeWallBay(mats, spec, stocker) {
     });
   }
 
-  const lightY = 1.74 + headH / 2;
+  const lightY = 1.71 + headH / 2; // STACKS.wallbay lightbox from
   box(mats.canopy, w - 0.04, headH, 0.04, 0, lightY, d / 2 - 0.02, group, false);
   const lightFace = new THREE.Mesh(
     new THREE.PlaneGeometry(w - 0.08, headH - 0.06),

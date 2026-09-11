@@ -1,17 +1,18 @@
 import { catalog, productsForBrand } from './catalog.js';
 
 /**
- * FRAN @ Bugis+ #01-04 furniture plan (PL-01, rev 18/08/26).
+ * FRAN @ Bugis+ #01-04 furniture plan (PL-01).
+ * Lock: FRAN_FULL_TECHNICAL_DRAWING_SET_110926.pdf (56p).
  * Units: metres. Origin = outer NW corner of the main sales rectangle.
  * +X east, +Z south, +Y up.
  *
  * Sales 178 m² · stock 34 m² · locker 4 m² · total 230 m².
  * Brand / product names come from fran-skums (sample-brands + product-list).
  *
- * Rev 18/08 fixture legend: 19× WB-S5 + 7× WB-M wallbays, 12× makeup +
- * 12× standard-4 + 8× standard-5 gondolas, endcaps EC-S3 ×6 / EC-S5 ×3 /
- * EC-M ×1, lightbox towers ×2, hygiene stations ×19 (8 on L-panels,
- * 8 standalone, 3 on the WB-M run).
+ * FULL 110926 legend: WB-M 7 · WB-S4 17 · WB-S5 2; GD-M 12 · GD-S4 20;
+ * EC-M 1 · EC-S3 2 · EC-S3+H 4 · EC-S5 3; HS-G 8.
+ * Lightboxes (fixture sheets + Store Dev confirm): wallbay 900×530,
+ * gondola 900×270, shelf cube 150×220×50.
  */
 
 function merch(brandNames) {
@@ -41,11 +42,11 @@ export const BAY = {
   drawerH: 0.42,
   logoH: 0.16,
   logoGap: 0.08,
-  headerH: 0.5,
+  headerH: 0.53, // wallbay lightbox H530
   gondolaD: 0.862,
-  gondolaH: 1.75,
+  gondolaH: 1.71, // GD-M sheet overall with H270 lightbox
   gondolaDrawer: 0.3,
-  gondolaLogo: 0.175,
+  gondolaLogo: 0.27,
   endcap: 0.431,
   bayW: 0.9,
   lightboxW: 0.25,
@@ -53,19 +54,22 @@ export const BAY = {
   twoBay: 2.662,
   threeBay: 3.762,
   threeBayShort: 3.381,
+  wallLightbox: { w: 0.9, h: 0.53 },
+  gondolaLightbox: { w: 0.9, h: 0.27 },
+  shelfLightbox: { w: 0.15, h: 0.22, d: 0.05 },
 };
 
 /** Shop-drawing component stacks (Rev 9) — metres from finished floor. */
 export const STACKS = {
   gondola: {
-    total: 1.75,
+    total: 1.71,
     parts: [
       { id: 'drawer', label: 'Base drawer', from: 0, to: 0.3 },
       { id: 's1', label: 'Shelf 1', from: 0.3, to: 0.58 },
       { id: 's2', label: 'Shelf 2', from: 0.58, to: 0.86 },
       { id: 's3', label: 'Shelf 3', from: 0.86, to: 1.14 },
-      { id: 's4', label: 'Shelf 4', from: 1.14, to: 1.575 },
-      { id: 'logo', label: 'Logo runner', from: 1.575, to: 1.75 },
+      { id: 's4', label: 'Shelf 4', from: 1.14, to: 1.44 },
+      { id: 'logo', label: 'Lightbox 270', from: 1.44, to: 1.71 },
     ],
   },
   wallbay: {
@@ -75,8 +79,8 @@ export const STACKS = {
       { id: 's1', label: 'Shelf 1', from: 0.42, to: 0.73 },
       { id: 's2', label: 'Shelf 2', from: 0.73, to: 1.04 },
       { id: 's3', label: 'Shelf 3', from: 1.04, to: 1.35 },
-      { id: 's4', label: 'Shelf 4', from: 1.35, to: 1.74 },
-      { id: 'lightbox', label: 'Lightbox 500', from: 1.74, to: 2.24 },
+      { id: 's4', label: 'Shelf 4', from: 1.35, to: 1.71 },
+      { id: 'lightbox', label: 'Lightbox 530', from: 1.71, to: 2.24 },
       { id: 'led', label: 'P4 LED 160', from: 2.24, to: 2.4 },
     ],
   },
@@ -84,9 +88,9 @@ export const STACKS = {
 
 const WB = BAY.wallD;
 
-/** WB-M bay centres — run starts at x 9.55; stations sit after bays 2, 4, 7. */
-const WBM_XS = [10.0, 10.9, 12.013, 12.913, 14.026, 14.926, 15.826];
-const HS_XS = [11.4565, 13.4695, 16.3825];
+/** WB-M bay centres — FULL PL-01 6940 run east of 1625 mirror; HS after bays 2, 4, 7. */
+const WBM_XS = [11.324, 12.224, 13.337, 14.237, 15.35, 16.25, 17.15];
+const HS_XS = [12.7805, 14.7935, 17.7065];
 
 /**
  * Gondola islands — rev 18/08. Per-end fittings via `ends` (w = west, e = east):
@@ -104,7 +108,7 @@ export const gondolas = [
     bays: 2,
     shelves: 5,
     w: BAY.twoBay,
-    x: 6.531,
+    x: 6.354,
     z: WB + 1.7 + BAY.gondolaD / 2,
     rot: 0,
     ends: { w: 'EC-S3', e: 'EC-S3' },
@@ -120,7 +124,7 @@ export const gondolas = [
     shelves: 4,
     makeup: true,
     w: BAY.threeBayShort,
-    x: 10.94,
+    x: 10.885,
     z: WB + 1.7 + BAY.gondolaD / 2,
     rot: 0,
     ends: { w: 'lightbox', e: 'EC-S3' },
@@ -136,7 +140,7 @@ export const gondolas = [
     shelves: 4,
     makeup: true,
     w: BAY.threeBay,
-    x: 15.72,
+    x: 15.951,
     z: WB + 1.7 + BAY.gondolaD / 2,
     rot: 0,
     ends: { w: 'EC-M', e: 'EC-S3' },
@@ -151,7 +155,7 @@ export const gondolas = [
     bays: 2,
     shelves: 5,
     w: BAY.twoBay,
-    x: 5.8,
+    x: 6.354,
     z: PLAN.depthWest - WB - 1.7 - BAY.gondolaD / 2,
     rot: 0,
     ends: { w: 'EC-S5', e: 'EC-S3' },
@@ -166,7 +170,7 @@ export const gondolas = [
     bays: 3,
     shelves: 4,
     w: BAY.threeBayShort,
-    x: 10.32,
+    x: 10.885,
     z: PLAN.depthWest - WB - 1.7 - BAY.gondolaD / 2,
     rot: 0,
     ends: { w: 'lightbox', e: 'EC-S3' },
@@ -181,7 +185,7 @@ export const gondolas = [
     bays: 3,
     shelves: 4,
     w: BAY.threeBay,
-    x: 15.39,
+    x: 15.951,
     z: PLAN.depthWest - WB - 1.7 - BAY.gondolaD / 2,
     rot: 0,
     ends: { w: 'EC-S5', e: 'EC-S5' },
@@ -197,42 +201,27 @@ export const gondolas = [
  * (the aisle side). Position is the bay centre on the floor.
  */
 export const wallBays = [
+  // North WB-S4 ×7 (6340) after fullheight + column pocket.
   ...run({
-    count: 6,
-    startX: 3.2,
+    count: 7,
+    startX: 3.357,
     z: WB / 2,
     facing: 's',
     category: 'hair',
     brandList: catalog.plan.wallBays.hair,
   }),
-  // Rev 18/08: north-east run is 7 makeup wallbays (WB-M) with 3 wallbay
-  // hygiene stations interleaved (2+2+3 pattern, 6939 total).
+  // North WB-M ×7 (6940) with 3 HS-W interleaved.
   ...makeupRun(),
+  // South WB-S4 ×7 (6340) on stock north face.
   ...run({
-    count: 5,
-    startX: 5.78,
+    count: 7,
+    startX: 4.946,
     z: PLAN.depthWest - WB / 2,
     facing: 'n',
     category: 'skincare',
     brandList: catalog.plan.wallBays.skincare,
   }),
-  ...run({
-    count: 3,
-    startX: 14.55,
-    z: PLAN.depthEast + 0.15,
-    facing: 'n',
-    category: 'suncare',
-    brandList: catalog.plan.wallBays.suncare,
-  }),
-  ...run({
-    count: 2,
-    startX: 17.55,
-    z: PLAN.depthEast + 0.15,
-    facing: 'n',
-    category: 'skincare',
-    brandList: catalog.plan.wallBays.skincareEast,
-  }),
-  // PL-01: 3 wallbays on the east face of the stock partition, into the experience.
+  // Stock-room east face WB-S4 ×3 (2740).
   ...runAlong({
     count: 3,
     x: 11.105 + BAY.wallD / 2,
@@ -240,6 +229,16 @@ export const wallBays = [
     facing: 'e',
     category: 'skincare',
     brandList: catalog.plan.wallBays.skincareEast,
+  }),
+  // SE jog WB-S5 ×2 (1840).
+  ...run({
+    count: 2,
+    startX: 12.14,
+    z: 9.895 + BAY.wallD / 2,
+    facing: 's',
+    category: 'suncare',
+    brandList: catalog.plan.wallBays.suncare,
+    variant: 'WB-S5',
   }),
 ];
 
@@ -276,7 +275,7 @@ export const hygieneStations = HS_XS.map((x, i) => ({
   vm: ['Sanitiser', 'Tissue / bin', 'Mirror'],
 }));
 
-function run({ count, startX, z, facing, category, brandList }) {
+function run({ count, startX, z, facing, category, brandList, variant }) {
   return runAlong({
     count,
     x: startX,
@@ -285,10 +284,11 @@ function run({ count, startX, z, facing, category, brandList }) {
     facing,
     category,
     brandList,
+    variant,
   });
 }
 
-function runAlong({ count, x, startZ, axis = 'z', facing, category, brandList }) {
+function runAlong({ count, x, startZ, axis = 'z', facing, category, brandList, variant }) {
   const out = [];
   for (let i = 0; i < count; i += 1) {
     const brand = brandList[i % brandList.length];
@@ -300,6 +300,7 @@ function runAlong({ count, x, startZ, axis = 'z', facing, category, brandList })
       z: alongX ? startZ : startZ + i * BAY.wallW,
       facing,
       category,
+      ...(variant ? { variant } : {}),
       ...merch([brand]),
       concept: `Wallbay · ${brand}`,
       vm: ['P4 LED category', 'Brand logo strip', 'Storage drawer'],
@@ -310,12 +311,12 @@ function runAlong({ count, x, startZ, axis = 'z', facing, category, brandList })
 
 /** Structural columns from PL-01 — centres on the wall lines, ~Ø800. */
 export const columns = [
-  { id: 'N-W', x: 1.56, z: 0.36, r: 0.4 },
-  { id: 'N-M', x: 9.97, z: 0.36, r: 0.4 },
-  { id: 'N-E', x: 18.32, z: 0.4, r: 0.42 },
-  { id: 'S-W', x: 2.52, z: 6.88, r: 0.4 },
-  { id: 'S-STK', x: 10.72, z: 7.12, r: 0.4 },
-  { id: 'E-S', x: 18.88, z: 6.52, r: 0.4 },
+  { id: 'N-W', x: 2.01, z: 0.45, r: 0.45 },
+  { id: 'N-M', x: 10.42, z: 0.45, r: 0.45 },
+  { id: 'N-E', x: 18.32, z: 0.45, r: 0.45 },
+  { id: 'S-W', x: 2.52, z: 6.88, r: 0.45 },
+  { id: 'S-STK', x: 10.72, z: 7.12, r: 0.45 },
+  { id: 'E-S', x: 18.88, z: 6.52, r: 0.45 },
 ];
 
 export const doors = {
@@ -332,32 +333,35 @@ export const doors = {
 };
 
 export const cashier = {
-  // Rev 18/08: counter depth 500 → 600.
-  x: 1.55,
-  z: 2.85,
-  w: 1.8,
-  d: 0.6,
-  h: 0.95,
-  graffiti: { x: 0.08, z: 2.7, w: 0.04, d: 3.4, h: 2.6 },
-  canopy: { x: 1.7, z: 2.7, w: 2.4, d: 1.6, y: 2.55 },
+  // CC-01: 2940 × 600 × 900, long axis N–S, 1000 off storefront.
+  x: 1.3,
+  z: 3.857,
+  w: 0.6,
+  d: 2.94,
+  h: 0.9,
+  graffiti: { x: 0.08, z: 3.857, w: 0.04, d: 3.4, h: 2.6 },
+  canopy: { x: 1.5, z: 3.857, w: 2.0, d: 3.2, y: 2.55 },
 };
 
-// Rev 18/08: queue line offset from the cashier 1000 → 1165.
+// PL-01 Queue Line fixture — T: head 1000×350 + stem 350×2000; gap from cashier 1107.
 export const queueFixtures = [
-  { x: 3.52, z: 2.35, w: 1.0, d: 0.45, h: 0.9 },
-  { x: 3.52, z: 3.55, w: 1.0, d: 0.45, h: 0.9 },
+  { x: 3.207, z: 2.6, w: 1.0, d: 0.35, h: 0.9 },
+  { x: 3.207, z: 3.95, w: 0.35, d: 2.0, h: 0.9 },
 ];
 
 export const experience = {
-  // PL-01 display table 1600 × 1800, east of stock / west of the round table.
-  table: { x: 12.42, z: 8.06, w: 1.6, d: 1.8, h: 0.9 },
-  round: { x: 16.55, z: 8.15, r: 1.15, h: 0.78 },
-  discLight: { x: 16.55, z: 8.15, r: 1.45, y: 3.28 },
+  // SUNCARE TABLE 900 × 1800, 1600 east of south WB-S4 run.
+  table: { x: 12.884, z: 8.06, w: 0.9, d: 1.8, h: 0.9 },
+  // SPECIAL FIXTURE stadium 3000 × 1800.
+  special: { x: 16.55, z: 8.15, w: 3.0, d: 1.8, h: 0.78 },
+  // Circum-approx kept for disc light / hide-spot helpers.
+  round: { x: 16.55, z: 8.15, r: 1.5, h: 0.78 },
+  discLight: { x: 16.55, z: 8.15, r: 1.7, y: 3.28 },
   maskWall: {
-    // Customised featured mascot wall — angled.
+    // MASK NICHE WALL — outer run 3700.
     x: 15.15,
     z: 9.35,
-    w: 3.42,
+    w: 3.7,
     rot: -0.72,
     category: 'mask',
     name: 'Mask wall',
@@ -416,11 +420,11 @@ export const staffDesk = {
   name: 'Staff desk',
   x: 2.9,
   z: 7.72,
-  w: 1.0,
+  w: 1.2,
   d: 0.8,
   h: 0.75,
   category: 'back of house',
-  concept: 'Staff desk · 1000 × 800 against the west wall',
+  concept: 'Staff desk · 1200 × 800 against the west wall',
   brands: [],
   vm: ['PL-01 staff desk'],
 };
@@ -430,11 +434,11 @@ export const managerDesk = {
   name: 'Manager desk',
   x: 2.9,
   z: 9.22,
-  w: 1.0,
+  w: 1.2,
   d: 1.2,
   h: 0.75,
   category: 'back of house',
-  concept: 'Manager desk · 1000 × 1200',
+  concept: 'Manager desk · 1200 × 1200',
   brands: [],
   vm: ['PL-01 manager desk'],
 };
@@ -613,16 +617,16 @@ export function fixtureAabbs() {
     });
   }
   boxes.push({
-    x0: experience.round.x - experience.round.r,
-    x1: experience.round.x + experience.round.r,
-    z0: experience.round.z - experience.round.r,
-    z1: experience.round.z + experience.round.r,
-    id: 'round',
+    x0: experience.special.x - experience.special.w / 2,
+    x1: experience.special.x + experience.special.w / 2,
+    z0: experience.special.z - experience.special.d / 2,
+    z1: experience.special.z + experience.special.d / 2,
+    id: 'special',
     kind: 'display',
     data: {
-      name: 'Experience table',
+      name: 'Special fixture',
       category: 'theme',
-      concept: 'Special display · testers',
+      concept: 'Special display · stadium 3000 × 1800',
       ...merch(catalog.plan.mask),
       vm: ['Risers / testers', 'Callout'],
     },
@@ -675,7 +679,7 @@ export function fixtureAabbs() {
     data: {
       name: 'Display table',
       category: 'theme',
-      concept: 'Special display · 1600 × 1800',
+      concept: 'Special display · suncare table 900 × 1800',
       ...merch(catalog.plan.mask),
       vm: ['Risers / testers'],
     },
