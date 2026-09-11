@@ -5,3 +5,10 @@ tools/shots/
 *.log
 .DS_Store
 Thumbs.db
+_pdf_sheets/
+_wip_store/
+_*.py
+_claude*
+FRAN_TECHNICAL_DRAWING_SET_110926.pdf
+FRAN_Furniture Layout_080926.pdf
+FRAN_FULL*.pdf
